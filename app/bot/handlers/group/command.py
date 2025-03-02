@@ -6,7 +6,7 @@ from aiogram import Router, F
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command, MagicData
 from aiogram.types import Message
-from aiogram.utils.markdown import hcode
+from aiogram.utils.markdown import hcode, hlink
 
 from app.bot.manager import Manager
 from app.bot.utils.redis import RedisStorage
@@ -54,8 +54,14 @@ async def handler(message: Message, manager: Manager, redis: RedisStorage) -> No
     user_data = await redis.get_by_message_thread_id(message.message_thread_id)
     if not user_data: return None  # noqa
 
+    url = f"https://t.me/{message.from_user.username}" if message.from_user.username != "-" else f"tg://user?id={message.from_user.id}"
+
+
     if user_data.message_silent_mode:
         text = manager.text_message.get("silent_mode_disabled")
+        with suppress(IndexError, KeyError):
+            text = text.format(full_name=hlink(message.from_user.full_name, url))
+
         with suppress(TelegramBadRequest):
             # Reply with the specified text
             await message.reply(text)
@@ -70,6 +76,8 @@ async def handler(message: Message, manager: Manager, redis: RedisStorage) -> No
         user_data.message_silent_id = None
     else:
         text = manager.text_message.get("silent_mode_enabled")
+        with suppress(IndexError, KeyError):
+            text = text.format(full_name=hlink(message.from_user.full_name, url))
         with suppress(TelegramBadRequest):
             # Reply with the specified text
             msg = await message.reply(text)
@@ -118,12 +126,21 @@ async def handler(message: Message, manager: Manager, redis: RedisStorage) -> No
     user_data = await redis.get_by_message_thread_id(message.message_thread_id)
     if not user_data: return None  # noqa
 
+    url = f"https://t.me/{message.from_user.username}" if message.from_user.username != "-" else f"tg://user?id={message.from_user.id}"
+
+
     if user_data.is_banned:
         user_data.is_banned = False
         text = manager.text_message.get("user_unblocked")
+
+        with suppress(IndexError, KeyError):
+            text = text.format(full_name=hlink(message.from_user.full_name, url))
     else:
         user_data.is_banned = True
         text = manager.text_message.get("user_blocked")
+
+        with suppress(IndexError, KeyError):
+            text = text.format(full_name=hlink(message.from_user.full_name, url))
 
     # Reply with the specified text
     await message.reply(text)
@@ -143,10 +160,20 @@ async def handler(message: Message, manager: Manager, redis: RedisStorage) -> No
     user_data = await redis.get_by_message_thread_id(message.message_thread_id)
     if not user_data: return None  # noqa
 
+    url = f"https://t.me/{message.from_user.username}" if message.from_user.username != "-" else f"tg://user?id={message.from_user.id}"
+
+
     topic_manager = TopicManager(manager.bot, redis, manager.config)
     await topic_manager.close_topic(message, user_data)
+
     text = manager.text_message.get("closed_topic")
     await message.bot.send_message(chat_id=user_data.id, text=text)
+
+    text = manager.text_message.get("closed_topic_by")
+    with suppress(IndexError, KeyError):
+            text = text.format(full_name=hlink(message.from_user.full_name, url))
+
+    await message.reply(text)
     await message.delete()
 
 @router.message(Command(commands=["open"]))
@@ -162,10 +189,19 @@ async def handler(message: Message, manager: Manager, redis: RedisStorage) -> No
     user_data = await redis.get_by_message_thread_id(message.message_thread_id)
     if not user_data: return None  # noqa
 
+    url = f"https://t.me/{message.from_user.username}" if message.from_user.username != "-" else f"tg://user?id={message.from_user.id}"
+
     topic_manager = TopicManager(manager.bot, redis, manager.config)
     await topic_manager.open_topic(message, user_data)
+
     text = manager.text_message.get("open_topic")
     await message.bot.send_message(chat_id=user_data.id, text=text)
+
+    text = manager.text_message.get("open_topic_by")
+    with suppress(IndexError, KeyError):
+            text = text.format(full_name=hlink(message.from_user.full_name, url))
+
+    await message.reply(text)
     await message.delete()
 
 @router.message(Command(commands=["status"]))
