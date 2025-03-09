@@ -8,7 +8,7 @@ from app.bot.utils.api import fetch_services
 from app.bot.utils.redis.models import UserData
 from app.bot.manager import Form
 
-
+from app.config import load_config
 
 def select_language_markup() -> InlineKeyboardMarkup:
     """
@@ -111,10 +111,13 @@ class Window:
         text = manager.text_message.get("main_menu")
         getstate = await manager.state.get_state()
 
+        config = load_config()
+        bot_name = config.bot.BOT_NAME
+
         services = await fetch_services(user_login=manager.user.id)
 
         with suppress(IndexError, KeyError):
-            text = text.format(full_name=hbold(manager.user.full_name))
+            text = text.format(full_name=hbold(manager.user.full_name), bot_name=hbold(bot_name))
 
         builder = InlineKeyboardBuilder()
 
