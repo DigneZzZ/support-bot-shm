@@ -5,6 +5,8 @@ services:
     image: ghcr.io/alfirovich/support-bot-shm/bot:latest
     container_name: support-bot
     restart: always
+    env_file:
+      - .env
     depends_on:
       - redis
     networks:
@@ -16,6 +18,8 @@ services:
     image: redis:alpine
     container_name: support-redis
     restart: always
+    env_file:
+      - .env
     volumes:
       - ./redis/data/:/data
     networks:
