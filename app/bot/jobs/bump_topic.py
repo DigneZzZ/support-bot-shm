@@ -1,4 +1,5 @@
 import aioredis
+import asyncio
 import logging
 import json
 from typing import List
@@ -49,6 +50,7 @@ async def bump_topic(bot: Bot, config: Config) -> None:
                                             parse_mode="HTML"
                                         )
                                         logger.info(f"Отправлен BUMP в thread_id={user_data.message_thread_id} для user_id={user_id}")
+                                        await asyncio.sleep(0.5)
                                     except Exception as e:
                                         logger.error(f"Ошибка при отправке BUMP для user_id={user_id}: {e}", exc_info=True)
                                 else:
