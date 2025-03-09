@@ -1,16 +1,15 @@
+# /app/bot/middlewares/manager.py
 from typing import Callable, Dict, Any, Awaitable
-
 from aiogram import BaseMiddleware
 from aiogram.fsm.context import FSMContext
 from aiogram.types import TelegramObject, User
-
 from app.bot.manager import Manager
-
 
 class ManagerMiddleware(BaseMiddleware):
     """
-    Middleware for passing manager object.
+    Middleware for passing manager object and scheduler.
     """
+
 
     async def __call__(
             self,

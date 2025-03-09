@@ -68,6 +68,9 @@ class TopicManager:
 
         new_name = f"🟢 {user_data.full_name}"
         try:
+            user_data.topic_status = "open"
+            await self.redis.update_user(user_data.id, user_data)
+
             await self.bot.edit_forum_topic(
                 chat_id=self.config.bot.GROUP_ID,
                 message_thread_id=user_data.message_thread_id,
@@ -79,8 +82,6 @@ class TopicManager:
                 message_thread_id=user_data.message_thread_id
             )
 
-            user_data.topic_status = "open"
-            await self.redis.update_user(user_data.id, user_data)
         except TelegramBadRequest as ex:
             if "TOPIC_NOT_MODIFIED" in ex.message:
                 pass
@@ -98,16 +99,19 @@ class TopicManager:
         try:
             user_data.topic_status = "new"
             await self.redis.update_user(user_data.id, user_data)
+
             await self.bot.edit_forum_topic(
                 chat_id=self.config.bot.GROUP_ID,
                 message_thread_id=user_data.message_thread_id,
                 name=new_name,
             )
 
+            '''
             await self.bot.close_forum_topic(
                 chat_id=self.config.bot.GROUP_ID,
                 message_thread_id=user_data.message_thread_id
             )
+            '''
         except TelegramBadRequest as ex:
             if "TOPIC_NOT_MODIFIED" in ex.message:
                 pass

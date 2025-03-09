@@ -42,6 +42,14 @@ async def handler(
     await get_or_create_forum_topic(message.bot, redis, manager.config, user_data)
 
 
+@router.message(Command("time"))
+async def handler(message: Message, manager: Manager, user_data: UserData) -> None:
+
+    last_message_date = user_data.last_message_date
+    text = f"Last time: {last_message_date}"
+
+    return await manager.send_message(text)
+
 @router.message(Command("language"))
 async def handler(message: Message, manager: Manager, user_data: UserData) -> None:
     """
@@ -60,8 +68,6 @@ async def handler(message: Message, manager: Manager, user_data: UserData) -> No
     else:
         await Window.select_language(manager)
     await manager.delete_message(message)
-
-
 
 
 @router.message(

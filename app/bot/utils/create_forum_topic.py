@@ -19,12 +19,14 @@ async def get_or_create_forum_topic(
 ) -> int:
     if user_data.message_thread_id is None:
         try:
+            topic_name = f"✰ {user_data.full_name}"
+
             # If message_thread_id is not found, create a forum topic
             message_thread_id = await create_forum_topic(
-                bot, config, user_data.full_name,
+                bot, config, topic_name,
             )
             user_data.message_thread_id = message_thread_id
-            user_data.topic_status = "new"
+            #user_data.topic_status = "new"
             await redis.update_user(user_data.id, user_data)
 
         except Exception as e:

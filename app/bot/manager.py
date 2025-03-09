@@ -1,5 +1,5 @@
 from contextlib import suppress
-from typing import Any, Dict
+from typing import Any, Dict, Callable
 
 from aiogram import Bot
 from aiogram.exceptions import TelegramBadRequest
@@ -62,6 +62,8 @@ class Manager:
         self.__data = data
 
 
+
+
     @property
     def middleware_data(self) -> Dict[str, Any]:
         """
@@ -70,6 +72,7 @@ class Manager:
         :return: Middleware data.
         """
         return self.__data
+
 
     async def get_old_message_id(self) -> int:
         """
@@ -100,6 +103,7 @@ class Manager:
             chat_id=self.user.id,
             show_alert=show_alert,
         )
+
 
     async def send_message(
             self,

@@ -1,10 +1,10 @@
 import asyncio
-
+from datetime import datetime, timezone, timedelta
 from contextlib import suppress
 from aiogram import Router, F
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import StateFilter
-from aiogram.types import Message
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
 
 from app.bot.manager import Manager
 from app.bot.types.album import Album
@@ -66,7 +66,7 @@ async def handle_waiting_state(
     topic_manager = TopicManager(manager.bot, redis, manager.config)
 
 
-    if current_state is None and user_data.topic_status == "closed":
+    if current_state is None and (not user_data.topic_status or user_data.topic_status == "closed"):
         return await Window.main_menu(manager)
 
     async def copy_message_to_topic():
@@ -98,24 +98,31 @@ async def handle_waiting_state(
             message_text=""
         
         if current_state is not None:
+            keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="✅ Принять обращение", callback_data="apply_appeal")]])
             await message.bot.send_message(
                 chat_id=manager.config.bot.GROUP_ID,
                 message_thread_id=message_thread_id,
                 text=message_text,
+                reply_markup=keyboard,
             )
 
         if not album:
-            await message.forward(
+            msg = await message.forward(
                 chat_id=manager.config.bot.GROUP_ID,
                 message_thread_id=message_thread_id,
             )
         else:
-            await album.copy_to(
+            msg = await album.copy_to(
                 chat_id=manager.config.bot.GROUP_ID,
                 message_thread_id=message_thread_id,
             )
 
-        if user_data.topic_status == "closed":
+        last_message_date = msg.date.astimezone(timezone(timedelta(hours=3))).strftime("%Y-%m-%d %H:%M:%S%z")
+        user_data.last_message_date = last_message_date
+        await redis.update_user(user_data.id, user_data)
+        print(f"Last message date updated: {user_data.last_message_date}")
+
+        if user_data.topic_status == "closed" or not user_data.topic_status:
             await topic_manager.new_topic(message, user_data)
         await manager.state.clear()
 

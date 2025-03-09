@@ -14,9 +14,13 @@ from app.bot.utils.topics import TopicManager
 
 from app.bot.handlers.group.windows import Window
 
+from app.config import Config
+from app.bot.jobs.send_new_topics import send_new_topics
+
 router_id = Router()
 router_id.message.filter(
     F.chat.type.in_(["group", "supergroup"]),
+    F.message_thread_id.is_(None),
 )
 
 
@@ -29,8 +33,14 @@ async def handler(message: Message) -> None:
     :return: None
     """
     await message.reply(hcode(message.chat.id))
+    await message.reply(hcode(message.message_thread_id))
     await message.delete()
 
+
+@router_id.message(Command("summary"))
+async def handler(message: Message, config: Config) -> None:
+    await message.delete()
+    await send_new_topics(message.bot, config)
 
 router = Router()
 router.message.filter(
@@ -38,6 +48,7 @@ router.message.filter(
     F.chat.type.in_(["group", "supergroup"]),
     MagicData(F.event_chat.id == F.config.bot.GROUP_ID),  # type: ignore
 )
+
 
 
 @router.message(Command("silent"))
@@ -177,7 +188,7 @@ async def handler(message: Message, manager: Manager, redis: RedisStorage) -> No
     await message.delete()
 
 @router.message(Command(commands=["open"]))
-async def handler(message: Message, manager: Manager, redis: RedisStorage) -> None:
+async def open_handler(message: Message, manager: Manager, redis: RedisStorage) -> None:
     """
     Opens the topic for a user in the group.
 
@@ -219,4 +230,6 @@ async def handler(message: Message, manager: Manager, redis: RedisStorage) -> No
 
     await message.reply(f"Статус топика: <b>{user_data.topic_status}</b>")
     await message.delete()
+
+
     

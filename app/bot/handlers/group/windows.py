@@ -27,14 +27,17 @@ class Window:
         api_data = await fetch_user_data(user_login=user_data.id)
         services = await fetch_services(user_login=user_data.id)
 
-        builder = InlineKeyboardBuilder()
-        user_id = base64.b64encode(f"userID={api_data['user_id']}".encode()).decode()
-
         if api_data is None:
             api_data = []
+            return
 
         if services is None:
             services = [] 
+            return
+
+        builder = InlineKeyboardBuilder()
+        user_id = base64.b64encode(f"userID={api_data['user_id']}".encode()).decode()
+
 
 
         builder.row(
