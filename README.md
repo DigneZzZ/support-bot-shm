@@ -65,6 +65,7 @@
 | `BOT_GROUP_ID`     | ID группы                                 | `-100*******`            |
 | `API_URL`          | Ссылка на шаблон SHM                         | `https://admin.example.com/shm/v1/public/bot_api` |
 | `BOT_USERNAME`     | Юзернейм бота (без @)                     | `YOUR_BOT_USERNAME`      |
+| `BOT_NAME`         | Название проекта / бота                     | `My Project name`      |
 
 
 
