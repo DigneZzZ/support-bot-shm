@@ -2,15 +2,11 @@ version: "3"
 
 services:
   bot:
-    build:
-      context: .
+    image: ghcr.io/alfirovich/support-bot-shm/bot:latest
     container_name: support-bot
-    command: sh -c "cd /usr/src/app && python -m app"
     restart: always
     depends_on:
       - redis
-    volumes:
-      - .:/usr/src/app
     networks:
       - network
     extra_hosts:
