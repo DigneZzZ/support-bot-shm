@@ -5,7 +5,7 @@ services:
     build:
       context: .
     container_name: support-bot
-    command: sh -c "cd /usr/src/app && watchfiles --filter python 'python -m app' ./app"
+    command: sh -c "cd /usr/src/app && python -m app"
     restart: always
     depends_on:
       - redis
