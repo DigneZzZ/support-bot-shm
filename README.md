@@ -33,8 +33,8 @@
 2. Скачай `docker-compose.yml` и `.env` с помощью `curl`:
 
     ```bash
-    curl -o docker-compose.yml https://raw.githubusercontent.com/alfirovich/support-bot-shm/refs/heads/dev/docker-compose.yml
-    curl -o .env https://raw.githubusercontent.com/alfirovich/support-bot-shm/refs/heads/dev/sample.env
+    curl -o docker-compose.yml https://raw.githubusercontent.com/DigneZzZ/support-bot-shm/refs/heads/dev/docker-compose.yml
+    curl -o .env https://raw.githubusercontent.com/DigneZzZ/support-bot-shm/refs/heads/dev/sample.env
     ```
 
 3. Настрой переменные в `.env`:
